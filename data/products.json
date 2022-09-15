@@ -1,1 +1,1 @@
-[{"id":1,"name":"shoe","price":"100","thumbnail":"shoe.jpg"}]
+[{"id":1,"name":"shoe","price":200,"thumbnail":"shoes.jpg"},{"id":2,"name":"buzo","price":"400","thumbnail":"buzo.jpg"},{"id":3,"name":"cinto","price":100,"thumbnail":"cinto.jpg"}]

@@ -22,7 +22,7 @@ router.get('/:id',async (req,res) =>{
 router.post('/', async (req,res)=>{
     const {name, price, thumbnail} = req.body;
     const newProduct = await api.saveProduct(name,price,thumbnail);
-    return newProduct 
+    return res.json(newProduct)
 });
 
 router.put('/:id', async (req,res) =>{
@@ -30,21 +30,15 @@ router.put('/:id', async (req,res) =>{
     if ( !name || !price || !thumbnail) {
         return res.status(400).json({ success: false, error: 'Wrong body format' });
       };
-    const saveProducts = await readFile('./data/products.json','utf-8')
-    const productsList = JSON.parse(saveProducts);
-    const productIndex = productsList.findIndex((prod) => prod.id === +id);
-    if (productIndex < 0) return res.status(404).json({ success: false, error: `Product id: ${productId} doesn't match!`});
-    const newProduct = {
-        ...productsList[productIndex],
-        name,
-        price,
-        thumbnail
-    };
-    productsList[productIndex] = newProduct;
-    writeFile('./data/products.json',JSON.stringify(productsList));
+    const newProduct = await api.updateProduct(id,name,price,thumbnail);
     return res.json({ success: true, result: newProduct});
     
 })
 
+router.delete('/:id', async (req,res) =>{
+    const { id } = req.params;
+    const products = await api.deleteByID(id);
+    return res.json({Products:products})
+})
 
 module.exports = router;

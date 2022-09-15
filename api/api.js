@@ -7,9 +7,11 @@ class API{
 
     async getProduct(){
         try {
+            this.products = []
             const saveProducts = await readFile('./data/products.json','utf-8')
             const productsList = JSON.parse(saveProducts);
-            return productsList
+            this.products.push(...productsList)
+            return this.products
         } catch (error) {
             return error
         }
@@ -29,28 +31,45 @@ class API{
     async saveProduct(name, price, thumbnail){
         try {
             const saveProducts = await readFile('./data/products.json', 'utf-8');
-            const productsList = JSON.parse(saveProducts);
-            const newProduct = productsList.length === 0 ? { id:1, name, price, thumbnail} : {id: productsList.length + 1, name, price, thumbnail}
-            productsList.push(newProduct);
-            writeFile('./data/products.json',JSON.stringify(productsList));
+            const products = JSON.parse(saveProducts);
+            const newProduct = { id: products.length + 1, name: name, price: price, thumbnail: thumbnail} 
+            products.push(newProduct);
+            await writeFile('./data/products.json',JSON.stringify(products));
             return newProduct
        } catch (error) {
             return error
        }
     }
 
-    updateProduct(id,prod){
-
-    }
-    async delete (id){
+    async updateProduct(id,name,price,thumbnail){
         try {
-            const productsList = await readFile('./data/products.json','utf-8');
-            const parseProducts = [...JSON.parse(productsList)];
-            this.products = [...productsParse.filter((prod) => prod.id !== id)];
-            writeFile('./data/products,json',this.products);
-            return this.products
+            const saveProducts = await readFile('./data/products.json','utf-8')
+            const productsList = JSON.parse(saveProducts);
+            const productIndex = productsList.findIndex((prod) => prod.id == id);
+            if (productIndex < 0) return res.status(404).json({ success: false, error: `Product id: ${productId} doesn't match!`});
+            const newProduct = {
+                ...productsList[productIndex],
+                name,
+                price,
+                thumbnail
+            };
+            productsList[productIndex] = newProduct;
+            await writeFile('./data/products.json',JSON.stringify(productsList));
+            return newProduct
         } catch (error) {
-            return {error: error}
+            return error.message
+        }
+    }
+    async deleteByID (id){
+        try {
+            const saveProducts = await readFile('./data/products.json','utf-8')
+            const productsList = JSON.parse(saveProducts);
+            const newList = productsList.filter(p => p.id != id);
+            this.products = [...newList];
+            await writeFile('./data/products.json',JSON.stringify(newList));
+            return newList
+        } catch (error) {
+            return {error: error.message}
         }
     }
 }
